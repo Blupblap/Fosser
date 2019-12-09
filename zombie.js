@@ -123,7 +123,6 @@ function moverZombie(zombie){
 		
 		//Comprobamos si ha caído en un agujero o no
 		if(mapainterno[zombie.ymapa][zombie.xmapa] == 3){
-			console.log("He caido en un agujero");
 			var index = conseguirIndexAgujero(zombie.ymapa,zombie.xmapa);
 			if(agujeros[index].zombieDentro == false){
 				zombieficarAgujero(index);
@@ -145,13 +144,11 @@ function enAgujero(zombie){
 	zombie.imagen = mapaactual.imagenzombiecaido;
 	zombie.aturdimiento = setInterval(function () {
 		if(zombie.contadorAturdido < 5 && zombie.aturdido != false){
-			console.log(mapainterno);
 			zombie.aturdido = true;
 			zombie.contadorAturdido++;
 		}else{
 			zombie.contadorAturdido = 0;
 			zombie.imagen = mapaactual.imagenzombie;
-			console.log(mapainterno);
 			clearInterval(zombie.aturdimiento);
 			zombie.aturdido = false;
 			var indice = conseguirIndexAgujero(zombie.ymapa,zombie.xmapa);
