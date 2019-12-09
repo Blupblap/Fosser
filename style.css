@@ -1,0 +1,117 @@
+body{
+	background-color:black;
+}
+
+#fondoiz{
+	background-image:url("images/bosque.jpg");
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-color: #cccccc;
+	position:fixed;
+	top:0;
+	left:0;
+	height:100%;
+	width:33%;
+}
+#fondode{
+	background-image:url("images/bosqueinvert.jpg");
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-color: #cccccc;
+	position:fixed;
+	top:0;
+	right:0;
+	height:100%;
+	width:33%;
+}
+#mando{
+	background-image:url("images/mando.png");
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-color:black;
+	margin: auto;
+	position:fixed;
+	bottom:0;
+	left:35%;
+	height:25%;
+	width:32%;
+}
+#top{
+	background-image:url("images/fondo.jpg");
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-color:black;
+	margin: auto;
+	position:fixed;
+	top:0;
+	left:35%;
+	height:60%;
+	width:30%;
+	z-index:-1;
+}
+
+#inicio{
+
+	display: block;
+	position: relative; 
+	top: 130px;
+	left: 10%;
+	background-color: black;
+	color: green;
+	font-size: 1.3em;
+	font-weight: bold;
+	border: 2px solid green;
+	width: 300px;
+	padding: 10px;
+	text-align: center;
+	font-family: 'Press Start 2P', cursive;
+}
+
+#final{
+	display: none;
+	position: relative; 
+	top: 130px;
+	left: 10%;
+	background-color: black;
+	color: green;
+	font-size: 1.3em;
+	font-weight: bold;
+	border: 2px solid green;
+	width: 300px;
+	padding: 10px;
+	text-align: center;
+	font-family: 'Press Start 2P', cursive;
+
+}
+
+#juegoentero{
+	display: block;
+	margin: auto;
+	padding: 30px;
+	width: 400px;
+	height: 300px;
+	font-family: 'Press Start 2P', cursive;
+}
+
+
+#juego{
+	display: none;
+	position:fixed;
+	top:6%;
+	border: 5px solid black;
+	margin: auto;
+}
+
+#marcador{
+	color: black;
+	position: relative;
+	top: 410px;
+	left: 13%;
+	text-shadow: 2px 0 0 green, -2px 0 0 green, 0 2px 0 green, 0 -2px 0 green, 1px 1px green, -1px -1px 0 green, 1px -1px 0 green, -1px 1px 0 green;
+}
+
+.imagenesOcultas{
+	
+	display: none;
+	
+}
