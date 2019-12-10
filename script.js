@@ -48,6 +48,7 @@ var velocidadzombies = 800;
 var audioandar = new Audio('audio/andar.mp3');
 var aceptar = new Audio('audio/aceptar.wav');
 var myAudio;
+var refrescarjuego;
 
 
 class Mapa {
@@ -81,13 +82,50 @@ var puntos = 0;
 
 
 function iniciarJuego(){
+	reiniciarVariables();
 	document.getElementById("juego").style.display = "block";
 	document.getElementById("inicio").style.display = "none";
 	ctx = document.getElementById("juego").getContext("2d");
-	//nodo();
 	SeleccionMapa();
+	
+}
 
-
+function reiniciarVariables(){
+	mapainterno=[
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0]
+			];
+			
+	ctx = null;
+	acabado = 0;
+	empezado = 1;
+	finalizado = 0;
+	agujeros = [];
+	zombies = [];
+	tumbas = [];
+	contador = 0;
+	velocidadzombies = 800;
+	vidas = 3;
+	puntos = 0;
+	seleccionandoMapa = true;
+	mapaactual = mapa1;
+	if(myAudio){
+		myAudio.pause();
+		myAudio.currentTime = 0;	
+	}
+	if(refrescarjuego){
+		console.log("He limpiado el juego");
+		clearInterval(refrescarjuego);
+	}
+	clearInterval(movimientozombie);
+	console.log(velocidadzombies);
+	document.getElementById("marcador").style.display = "none";
 }
 
 function pintarSeleccion(){
@@ -123,7 +161,8 @@ function nodo(){
 
 	enterrador = new Enterrador(mapaactual.respawn[0][0],mapaactual.respawn[0][1]);
 	mapainterno[enterrador.ymapa][enterrador.xmapa] = 1;
-	
+	document.getElementById("marcador").style.display = "block";
+
 	sacarZombie();
 	
 	myAudio.pause();
@@ -154,7 +193,7 @@ function nodo(){
 			}
 		}, velocidadzombies);		
 		
-	var refrescarjuego = setInterval(function () { juego() }, 16,7);
+	refrescarjuego = setInterval(function () { juego() }, 16,7);
 	
 }
 
@@ -571,6 +610,8 @@ window.onkeydown = function(e) {
 			Keys.S = true;
 		}else if(kc == 68){
 			Keys.D = true;
+		}else if(kc == 32){
+			iniciarJuego();
 		}
 		dibujarEnterrador();
 	}

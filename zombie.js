@@ -15,10 +15,8 @@ class Zombie {
 		this.aturdido = false;
 		this.aturdimiento = "";
 		
-		var direccion = "arriba";
-		
+		var direccion = "arriba";	
 	}
-		
 }
 
 function dibujarZombie(zombie){
@@ -29,7 +27,6 @@ function dibujarZombie(zombie){
 function moverZombie(zombie){
 	var caminosPosibles = []; 
 	if(zombie.aturdido == false){
-		console.log("No estoy aturdido");
 		if(zombie.xmapa-1 >= 0){
 			if(zombie.mapa.layout[zombie.ymapa][zombie.xmapa-1] == 0){
 				caminosPosibles.push("izquierda");
