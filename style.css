@@ -90,12 +90,13 @@ body{
 	font-size: 1em;
 	font-family: 'Press Start 2P', cursive;
 	position: relative;
-	top: -15%;
+	top: -5%;
 	left: 6%;
 }
 
-#ranking ul{
-	list-style-type: none;
+#ranking li{
+	position: relative;
+	left: 13%;
 }
 
 #juegoentero{

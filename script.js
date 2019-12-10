@@ -262,9 +262,10 @@ function recibirDatos(){
 	personas.sort(compare);
 	var output = "<ol><h1>RANKINGS</h1>"
 	for(var i = 0; i<personas.length && i< 10; i++){
-		output+= "<li> "+personas[i].nombre + ": "+personas[i].puntuacionfinal+"</li>";
+		output+= "<li> "+personas[i].nombre + ": <b>"+personas[i].puntuacionfinal+"</b></li>";
 	}
-	output+="</ol>";
+	output+="-. "+jugador.nombre + ": <b>"+jugador.puntuacionfinal+"</b>";
+	output+="<br><h3>PULSA ESPACIO</h3></ol>";
 	console.log(output);
 	document.getElementById("ranking").innerHTML = output;
 }
