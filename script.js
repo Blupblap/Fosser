@@ -49,6 +49,7 @@ var audioandar = new Audio('audio/andar.mp3');
 var aceptar = new Audio('audio/aceptar.wav');
 var myAudio;
 var refrescarjuego;
+var jugador;
 
 
 class Mapa {
@@ -82,6 +83,11 @@ var puntos = 0;
 
 
 function iniciarJuego(){
+	var nombre = prompt("Introduce tu nombre!", "Harry Potter");
+	if(nombre == null){
+		nombre = prompt("Introduce tu nombre!", "Harry Potter");
+	}
+	jugador = new Jugador(nombre);
 	reiniciarVariables();
 	document.getElementById("juego").style.display = "block";
 	document.getElementById("inicio").style.display = "none";
@@ -126,6 +132,8 @@ function reiniciarVariables(){
 	clearInterval(movimientozombie);
 	console.log(velocidadzombies);
 	document.getElementById("marcador").style.display = "none";
+	document.getElementById("final").style.display = "none";
+	document.getElementById("ranking").style.display = "none";
 }
 
 function pintarSeleccion(){
@@ -229,13 +237,47 @@ function juego(){
 		}
 		//FINAL DEL JUEGO
 	}else{
-		//document.getElementById("juegoentero").style.display = "none";
+		
+		clearInterval(refrescarjuego);
 		document.getElementById("final").style.display = "block";
+		jugador.puntuacionfinal = puntos;
+
+		seleccionandoMapa = true;
+		empezado = 2;
+		recibirDatos();
+		//Guardamos los datos con localstorage
 		
 	}	
 }
 
+//Local storage
+function recibirDatos(){
+	var arrayStorage = JSON.parse(window.localStorage.getItem('jugadores'));
+	if(arrayStorage == null){
+		arrayStorage = [];
+	}
+	arrayStorage.push(jugador);
+	localStorage.setItem('jugadores', JSON.stringify(arrayStorage));
+	personas  = JSON.parse(window.localStorage.getItem('jugadores'));
+	personas.sort(compare);
+	var output = "<ol><h1>RANKINGS</h1>"
+	for(var i = 0; i<personas.length && i< 10; i++){
+		output+= "<li> "+personas[i].nombre + ": "+personas[i].puntuacionfinal+"</li>";
+	}
+	output+="</ol>";
+	console.log(output);
+	document.getElementById("ranking").innerHTML = output;
+}
 
+function compare( a, b ) {
+	if ( a.puntuacionfinal > b.puntuacionfinal ){
+	  return -1;
+	}
+	if ( a.puntuacionfinal < b.puntuacionfinal ){
+	  return 1;
+	}
+	return 0;
+  }
 
 function dibujar(){	
 	var img;
@@ -582,14 +624,26 @@ window.onkeydown = function(e) {
 			}
 		}else if(kc == 32){
 			if(empezado == 0){
+				//Pantalla de inicio
 				aceptar.play();
 				iniciarJuego();
 				empezado = 1;
 			}else if(empezado == 1){
+				//Pantalla de selección de mapa
 				seleccionandoMapa = false;
 				aceptar.play();
 				nodo();
-				empezado = 2;
+				empezado = "";
+			}else if(empezado == 2){
+				//Confirmación final
+				aceptar.play();
+				document.getElementById("juego").style.display = "none";
+				document.getElementById("final").style.display = "none";
+				document.getElementById("marcador").style.display = "none";
+				document.getElementById("ranking").style.display = "block";
+				empezado = 3;
+			}else if(empezado == 3){
+				iniciarJuego();
 			}
 		}	
 
@@ -610,8 +664,6 @@ window.onkeydown = function(e) {
 			Keys.S = true;
 		}else if(kc == 68){
 			Keys.D = true;
-		}else if(kc == 32){
-			iniciarJuego();
 		}
 		dibujarEnterrador();
 	}
@@ -679,5 +731,12 @@ class Tumba {
 		this.y = y;
 		this.x = x;
 		this.imagen = document.getElementById("tumba");	
+	}
+}
+
+class Jugador {
+	constructor(nombre){
+		this.nombre = nombre;
+		this.puntuacionfinal = 0;
 	}
 }

@@ -84,6 +84,20 @@ body{
 
 }
 
+#ranking{
+	display: none;
+	color: green;
+	font-size: 1em;
+	font-family: 'Press Start 2P', cursive;
+	position: relative;
+	top: -15%;
+	left: 6%;
+}
+
+#ranking ul{
+	list-style-type: none;
+}
+
 #juegoentero{
 	display: block;
 	margin: auto;
