@@ -1,4 +1,5 @@
 
+//Layout de los mapas
 const mapalayout1=[
 		   [0,0,0,0,0,0,0,0],
 		   [0,5,0,1,1,0,1,0],
@@ -32,28 +33,39 @@ var mapainterno=[
 		   ];
 		   
 var ctx = null;
+
+//Creamos las constantes del juego
 const anchuraCasilla = 50;
 const alturaCasilla = 50;
 const TIEMPO_ANIMACION = 30;
+const LIMITE_VELOCIDAD = 400;
+const DEINCREMENTO_VELOCIDAD = 100;
+const TIEMPO_AUMENTO_DIFICULTAD = 900;
+const LIMITE_ZOMBIES = 10;
+
+//Definimos las diferentes variables globales que nos servirán para controlar todo el juego.
 var acabado = 0;
 var empezado = 0;
-var enterrador;
 var finalizado = 0;
+//Estos arrays controlarán los zombies agujeros y tumbas del mapa para poder re pintarlos luego
 var agujeros = [];
 var zombies = [];
 var tumbas = [];
 var contador = 0;
 var movimientozombie = "";
 var velocidadzombies = 800;
-var audioandar = new Audio('audio/andar.mp3');
-var aceptar = new Audio('audio/aceptar.wav');
-var myAudio;
+var enterrador;
 var refrescarjuego;
 var jugador;
 
+var vidas = 3;
+var puntos = 0;
 
-class Mapa {
-		
+var aceptar = new Audio('audio/aceptar.wav');
+var myAudio;
+
+//Este es el constructor del mapa, el cual con una matriz de numeros y diferentes variables crea el mapa que sea.
+class Mapa {		
 	constructor(array,anchura,altura,imagenpared,imagensuelo,imagenzombie,imagenzombiecaido,imagenrespawner,respawnx,respawny){
 		this.layout = array;
 		this.anchura = anchura;
@@ -67,36 +79,37 @@ class Mapa {
 	}
 }
 
-
 var seleccionandoMapa = true;
 var selector;
+
+//Constantes con las variables de los mapas, que incluyen el sprite del suelo, del zombie, el layout...
 const mapa1 = new Mapa(mapalayout1,8,8,document.getElementById("pared1"),document.getElementById("suelo1"),
 document.getElementById("zombie"),document.getElementById("zombiecaido"),document.getElementById("spawner"),4,4);
 const mapa2 = new Mapa(mapalayout2,8,8,document.getElementById("pared2"),document.getElementById("suelo2"),
 document.getElementById("momia"),document.getElementById("momiacaida"),document.getElementById("spawner2"),4,3);
+
+
+//Ponemos por defecto el mapa 1
 var mapaactual = mapa1;
 
-
-
-var vidas = 3;
-var puntos = 0;
-
-
+//Esta función se inicia cada vez que empieza el juego, ya sea reiniciandolo o la primera vez que se inicia.
 function iniciarJuego(){
-	var nombre = prompt("Introduce tu nombre!", "Harry Potter");
-	if(nombre == null){
-		nombre = prompt("Introduce tu nombre!", "Harry Potter");
+
+	var nombre = prompt("Introduce tu nombre!", "Sombo");	//Se pide un nombre hasta que se introduzca.
+	while(nombre == ""){
+		nombre = prompt("Introduce tu nombre!", "Sombo");
 	}
+
 	jugador = new Jugador(nombre);
-	reiniciarVariables();
+	reiniciarVariables();	//Antes de empezar lo reiniciamos todo, en caso de que no sea la primera vez que se inicia.
 	document.getElementById("juego").style.display = "block";
 	document.getElementById("inicio").style.display = "none";
-	ctx = document.getElementById("juego").getContext("2d");
-	SeleccionMapa();
+	ctx = document.getElementById("juego").getContext("2d");	//Y cogemos el canvas
+	SeleccionMapa();	//Lo primero que hace el juego es ir a la pantalla de selección de mapa.
 	
 }
 
-function reiniciarVariables(){
+function reiniciarVariables(){	//Reinicia todas las variables del juego.
 	mapainterno=[
 			[0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0],
@@ -136,7 +149,7 @@ function reiniciarVariables(){
 	document.getElementById("ranking").style.display = "none";
 }
 
-function pintarSeleccion(){
+function pintarSeleccion(){		//Pinta la pantalla de selección de mapas.
 	img = document.getElementById("fondo");
 	ctx.drawImage(img,0,0);
 	ctx.fillStyle = "black";
@@ -149,7 +162,7 @@ function pintarSeleccion(){
 	ctx.drawImage(img,220,80);
 }
 
-function SeleccionMapa(){
+function SeleccionMapa(){	//Función que se repite cada vez que nos movamos por la selección de mapa.
 	//Musica de fondo-------
 		myAudio = new Audio('audio/musicamenu.mp3'); 
 		myAudio.addEventListener('ended', function() {
@@ -160,14 +173,14 @@ function SeleccionMapa(){
 		myAudio.volume = 0.3;
 		myAudio.play();
 	//-------------------
-	pintarSeleccion();
+	pintarSeleccion();	//Pinta los mapas
 	selector = new Selector(70,250);
-	dibujarSelector();
+	dibujarSelector();	//Y pinta el cursor selector
 }
 
-function nodo(){
+function nodo(){	//La función nodo es la función que inicia el juego como tal y el intervalo de juego.
 
-	enterrador = new Enterrador(mapaactual.respawn[0][0],mapaactual.respawn[0][1]);
+	enterrador = new Enterrador(mapaactual.respawn[0][0],mapaactual.respawn[0][1]);	//Creamos al enterrador en su sitio de spawn
 	mapainterno[enterrador.ymapa][enterrador.xmapa] = 1;
 	document.getElementById("marcador").style.display = "block";
 
@@ -176,7 +189,7 @@ function nodo(){
 	myAudio.pause();
 	myAudio.currentTime = 0;	
 	//Musica de fondo-------
-	if(mapaactual == mapa1){
+	if(mapaactual == mapa1){		//Se selecciona la musica dependiendo del mapa
 		myAudio = new Audio('audio/musica.mp3'); 
 	}else if(mapaactual == mapa2){
 		myAudio = new Audio('audio/musica2.mp3'); 
@@ -190,10 +203,10 @@ function nodo(){
 	myAudio.play();
 	//-------------------
 
-	dibujar();	
+	dibujar();	//Se dibujan INICIALMENTE el mapa y el enterrador una sola vez
 	dibujarEnterrador();
 	
-	movimientozombie = setInterval(function () {
+	movimientozombie = setInterval(function () {	//Se le asigna un intervalo de movimiento al zombie inicial.
 			if(zombies.length > 0){
 				for(var i = 0; i<zombies.length;i++){
 					moverZombie(zombies[i]);
@@ -201,20 +214,20 @@ function nodo(){
 			}
 		}, velocidadzombies);		
 		
-	refrescarjuego = setInterval(function () { juego() }, 16,7);
+	refrescarjuego = setInterval(function () { juego() }, 16,7); //Y empieza el intervalo del juego, que se repetirá hasta que acabe.
 	
 }
 
-function juego(){
+function juego(){ //Función que se repetirá con cada frame del juego.
 	
 	if(finalizado != 1){
-		if(contador == 900){
-			if(zombies.length < 10){
+		if(contador == TIEMPO_AUMENTO_DIFICULTAD){	//Cada X veces que se ejecute esta función aumentará la dificultad un poco.
+			if(zombies.length < LIMITE_ZOMBIES){	//Además de que se agregará un zombie extra.
 				sacarZombie();
 			}
 			
-			if(velocidadzombies > 400){
-				velocidadzombies = velocidadzombies - 100;
+			if(velocidadzombies > LIMITE_VELOCIDAD){	//Si puede ir mas rapido, irá mas rapido hasta llegar al limite.
+				velocidadzombies-= DEINCREMENTO_VELOCIDAD;
 				clearInterval(movimientozombie);
 				movimientozombie = setInterval(function () {
 				if(zombies.length > 0){
@@ -231,13 +244,12 @@ function juego(){
 		
 		
 		if(vidas > -1){
-			dibujar();
+			dibujar();	//Y si aún quedan vidas lo dibuja todo de nuevo.
 		}else{
-			finalizado = 1;
+			finalizado = 1; //Si no, acaba el juego.
 		}
-		//FINAL DEL JUEGO
 	}else{
-		
+		//FINAL DEL JUEGO: Se limpia el intervalo de juego y se muestra el ranking.
 		clearInterval(refrescarjuego);
 		document.getElementById("final").style.display = "block";
 		jugador.puntuacionfinal = puntos;
@@ -261,6 +273,7 @@ function recibirDatos(){
 	personas  = JSON.parse(window.localStorage.getItem('jugadores'));
 	personas.sort(compare);
 	var output = "<ol><h1>RANKINGS</h1>"
+	//El ranking solo mostrará a los 10 primeros + la última partida.
 	for(var i = 0; i<personas.length && i< 10; i++){
 		output+= "<li> "+personas[i].nombre + ": <b>"+personas[i].puntuacionfinal+"</b></li>";
 	}
@@ -270,16 +283,18 @@ function recibirDatos(){
 	document.getElementById("ranking").innerHTML = output;
 }
 
+//Función para ordenar el ranking dependiendo de los puntos.
 function compare( a, b ) {
 	if ( a.puntuacionfinal > b.puntuacionfinal ){
-	  return -1;
+		return -1;
 	}
 	if ( a.puntuacionfinal < b.puntuacionfinal ){
-	  return 1;
+		return 1;
 	}
 	return 0;
-  }
+}
 
+//Funcion que dibuja todo el mapa y sus elementos (Agujeros, zombies, tumbas...)
 function dibujar(){	
 	var img;
 	for(var y = 0; y < mapaactual.altura; ++y)
@@ -304,7 +319,7 @@ function dibujar(){
 					img = document.getElementById("respawn");
 					ctx.drawImage(img,x*anchuraCasilla,y*alturaCasilla);
 			}
-			
+			//Opción para que se vean las cuadriculas
 			//ctx.strokeRect( x*anchuraCasilla, y*alturaCasilla, anchuraCasilla, alturaCasilla);
 			}
 	}
@@ -335,6 +350,7 @@ function dibujarMarcador(){
 	document.getElementById("marcador").innerHTML = "<b>Vidas: "+vidas+"   Puntos: "+puntos+"</b>";
 }
 
+//Función que se activa al recibir daño
 function restarVida(){
 	var audio = new Audio('audio/golpe.mp3');
 	audio.play();
@@ -342,13 +358,20 @@ function restarVida(){
 	console.log("Has recibido daño");
 	vidas = vidas-1;
 	mapainternoset0();
-	enterrador = new Enterrador(mapaactual.respawn[0][0],mapaactual.respawn[0][1]);
+
+	//Y se espera medio segundo a volver a aparecer, para dar tiempo a reaccionar.
+	enterrador = "";
+	setTimeout(function(){
+		enterrador = new Enterrador(mapaactual.respawn[0][0],mapaactual.respawn[0][1]);
+	}, 500);
+	
 }
 
 function sumarPuntos(numero){
 	puntos = puntos+numero;
 }
 
+//Esta función es de las mas importantes del programa. Re-dibuja EN EL MAPA INTERNO al enterrador y lo mueve dependiendo de la tecla pulsada.
 function dibujarEnterrador(){
 	var ymapa;
 	var xmapa;
@@ -374,7 +397,6 @@ function dibujarEnterrador(){
 				restarVida();
 			}else{
 				mapainternoset0();
-				audioandar.play();
 				enterrador.y-=alturaCasilla/2;	
 				setTimeout(function(){
 					enterrador.y-=alturaCasilla/2;
@@ -390,7 +412,6 @@ function dibujarEnterrador(){
 				restarVida();
 			}else{
 				mapainternoset0();
-				audioandar.play();
 				enterrador.y+=alturaCasilla/2;	
 				setTimeout(function(){
 					enterrador.y+=alturaCasilla/2;
@@ -406,7 +427,6 @@ function dibujarEnterrador(){
 				restarVida();
 			}else{
 				mapainternoset0();
-				audioandar.play();
 				enterrador.x+=alturaCasilla/2;	
 				setTimeout(function(){
 					enterrador.x+=alturaCasilla/2;
@@ -422,7 +442,6 @@ function dibujarEnterrador(){
 				restarVida();
 			}else{
 				mapainternoset0();
-				audioandar.play();
 				enterrador.x-=alturaCasilla/2;	
 				setTimeout(function(){
 					enterrador.x-=alturaCasilla/2;
@@ -447,7 +466,7 @@ function dibujarEnterrador(){
 		xmapa = enterrador.xmapa-1;
 	}
 	
-	//Agujeros
+	//También dibuja los agujeros nuevos.
 	if (Keys.W && ymapa >= 0 || Keys.S && ymapa < mapaactual.altura || Keys.D && xmapa < mapaactual.anchura || Keys.A && xmapa >= 0){
 		if (Keys.W){
 			enterrador.imagen = document.getElementById("FosserT");
@@ -482,18 +501,28 @@ function dibujarEnterrador(){
 	}
 }
 
+function mapainternoset0(){
+	mapainterno[enterrador.ymapa][enterrador.xmapa] = 0;
+}
+
+function mapainternoset1(){
+	mapainterno[enterrador.ymapa][enterrador.xmapa] = 1;
+}
+
+//Dibuja al enterrador de forma visual para que se pueda ver
 function insertarEnterrador(){
-	
 	var img = enterrador.imagen;
 	ctx.drawImage(img,enterrador.xmapa*anchuraCasilla, enterrador.ymapa*anchuraCasilla);
 	mapainternoset1();
 }
 
+//Dibuja el selector de mapas.
 function dibujarSelector(){
 	var img = selector.imagen;
 	ctx.drawImage(img,selector.x,selector.y);
 }
 
+//Se crea un agujero y se agrega al array de agujeros
 function crearAgujero (y, x){
 	var cavar = new Audio('audio/cavar.wav');
 	cavar.volume = 0.3;
@@ -503,6 +532,7 @@ function crearAgujero (y, x){
 
 }
 
+//Se crea una tumba y se agrega al array de tumbas. También se mapa al zombie.
 function crearTumba(y,x){
 	var muertezombie = new Audio('audio/muertezombie.mp3');
 	muertezombie.volume = 0.4;
@@ -514,11 +544,9 @@ function crearTumba(y,x){
 }
 
 function dibujarAgujero(agujero){
-	
 	mapainterno[agujero.y][agujero.x] = 3;
 	var img = agujero.imagen;
 	ctx.drawImage(img,agujero.x*alturaCasilla,agujero.y*anchuraCasilla);
-
 }
 
 function dibujarTumba(tumba){
@@ -529,6 +557,7 @@ function dibujarTumba(tumba){
 	
 }
 
+//A esta función le pasas las coordenadas de un agujero y te devuelve su posición en el array
 function conseguirIndexAgujero(y,x){
 	
 	for(var i = 0; i < agujeros.length ; i++){
@@ -536,8 +565,7 @@ function conseguirIndexAgujero(y,x){
 			
 			return i;
 		}	
-	}
-	
+	}	
 }
 
 function conseguirIndexSpawns(){
@@ -552,6 +580,7 @@ function conseguirIndexSpawns(){
 	return posicionesSpawns;
 }
 
+//Saca un zombie de forma aleatoria en cualquiera de los dos spawners de zombies del mapa.
 function sacarZombie(){
 	var spawns = conseguirIndexSpawns();
 	var rand = Math.floor(Math.random()*2);
@@ -572,17 +601,9 @@ function eliminarAgujero(index){
 }
 
 function zombieficarAgujero(index){
-	agujeros[index].color = "green";
 	agujeros[index].zombieDentro = true;
 }
 
-function mapainternoset0(){
-	mapainterno[enterrador.ymapa][enterrador.xmapa] = 0;
-}
-
-function mapainternoset1(){
-	mapainterno[enterrador.ymapa][enterrador.xmapa] = 1;
-}
 
 var Keys = {
 	
@@ -597,11 +618,13 @@ var Keys = {
 	espacio: false
 };
 
+//Esta funcións e activa cad< vez que se pulse una tecla
 window.onkeydown = function(e) {
 	
 	var kc = e.keyCode;
 	e.preventDefault();
 	
+	//El modo "seleccionandoMapa es todo lo que no sea el juego, basicamente todos los menús."
 	if(seleccionandoMapa){
 		if(kc == 37){
 			if(mapaactual == mapa2){
@@ -649,6 +672,7 @@ window.onkeydown = function(e) {
 		}	
 
 	}else{
+		//Controles del juego.
 		if(kc == 37){
 			Keys.izquierda = true;
 		}else if(kc == 38){
@@ -670,7 +694,7 @@ window.onkeydown = function(e) {
 	}
 }
 
-window.onkeyup= function(e) {
+window.onkeyup= function(e) { //Cuando se levanta la tecla, se pone a false de nuevo.
 	
 	var kc = e.keyCode;
 	e.preventDefault();
