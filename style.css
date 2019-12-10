@@ -112,7 +112,7 @@ body{
 #juego{
 	display: none;
 	position:fixed;
-	top:6%;
+	top:5%;
 	border: 5px solid black;
 	margin: auto;
 }

@@ -38,10 +38,11 @@ var ctx = null;
 const anchuraCasilla = 50;
 const alturaCasilla = 50;
 const TIEMPO_ANIMACION = 30;
-const LIMITE_VELOCIDAD = 400;
-const DEINCREMENTO_VELOCIDAD = 100;
+const LIMITE_VELOCIDAD = 500;
+const VELOCIDAD_RAGE = 400;
+const DEINCREMENTO_VELOCIDAD = 50;
 const TIEMPO_AUMENTO_DIFICULTAD = 900;
-const LIMITE_ZOMBIES = 10;
+const LIMITE_ZOMBIES = 7;
 
 //Definimos las diferentes variables globales que nos servirán para controlar todo el juego.
 var acabado = 0;
@@ -57,6 +58,8 @@ var velocidadzombies = 800;
 var enterrador;
 var refrescarjuego;
 var jugador;
+var modoRage = 0;
+var multiplicadorPuntos = 1;
 
 var vidas = 3;
 var puntos = 0;
@@ -132,7 +135,9 @@ function reiniciarVariables(){	//Reinicia todas las variables del juego.
 	velocidadzombies = 800;
 	vidas = 3;
 	puntos = 0;
+	modoRage = 0;
 	seleccionandoMapa = true;
+	document.getElementById("marcador").style.color = "black";
 	mapaactual = mapa1;
 	if(myAudio){
 		myAudio.pause();
@@ -164,14 +169,7 @@ function pintarSeleccion(){		//Pinta la pantalla de selección de mapas.
 
 function SeleccionMapa(){	//Función que se repite cada vez que nos movamos por la selección de mapa.
 	//Musica de fondo-------
-		myAudio = new Audio('audio/musicamenu.mp3'); 
-		myAudio.addEventListener('ended', function() {
-			myAudio.volume = 0.3;
-			this.currentTime = 0;
-			this.play();
-		}, false);
-		myAudio.volume = 0.3;
-		myAudio.play();
+		cambiarMusica('audio/musicamenu.mp3'); 
 	//-------------------
 	pintarSeleccion();	//Pinta los mapas
 	selector = new Selector(70,250);
@@ -186,26 +184,17 @@ function nodo(){	//La función nodo es la función que inicia el juego como tal 
 
 	sacarZombie();
 	
-	myAudio.pause();
-	myAudio.currentTime = 0;	
 	//Musica de fondo-------
 	if(mapaactual == mapa1){		//Se selecciona la musica dependiendo del mapa
-		myAudio = new Audio('audio/musica.mp3'); 
+		cambiarMusica('audio/musica.mp3'); 
 	}else if(mapaactual == mapa2){
-		myAudio = new Audio('audio/musica2.mp3'); 
+		cambiarMusica('audio/musica2.mp3'); 
 	}	
-	myAudio.addEventListener('ended', function() {
-		myAudio.volume = 0.3;
-		this.currentTime = 0;
-		this.play();
-	}, false);
-	myAudio.volume = 0.3;
-	myAudio.play();
-	//-------------------
 
 	dibujar();	//Se dibujan INICIALMENTE el mapa y el enterrador una sola vez
-	dibujarEnterrador();
-	
+	if(enterrador){
+		dibujarEnterrador();
+	}
 	movimientozombie = setInterval(function () {	//Se le asigna un intervalo de movimiento al zombie inicial.
 			if(zombies.length > 0){
 				for(var i = 0; i<zombies.length;i++){
@@ -218,15 +207,51 @@ function nodo(){	//La función nodo es la función que inicia el juego como tal 
 	
 }
 
+function cambiarMusica(cancion){
+	if(myAudio){
+		myAudio.pause();
+		myAudio.currentTime = 0;
+	}	
+	//Musica de fondo-------
+	myAudio = new Audio(cancion); 	
+	myAudio.addEventListener('ended', function() {
+		myAudio.volume = 0.3;
+		this.currentTime = 0;
+		this.play();
+	}, false);
+	myAudio.volume = 0.4;
+	myAudio.play();
+}
+
 function juego(){ //Función que se repetirá con cada frame del juego.
 	
 	if(finalizado != 1){
+		//Si llega a 3000 puntos, aumenta la dificultad drasticamente.
+		if(puntos >= 3000){
+			if(modoRage != 3){
+				modoRage = 1;
+				multiplicadorPuntos = 1,5;
+			}
+		}
+		if(modoRage == 1){
+			var audio = new Audio('audio/grito.wav');
+			audio.play();
+			if(mapaactual == mapa1){
+				cambiarMusica("audio/modoRage1.mp3");
+			}else if(mapaactual == mapa2){
+				cambiarMusica("audio/modoRage2.mp3");
+			}
+			document.getElementById("marcador").style.color = "dark-red";
+			velocidadzombies = VELOCIDAD_RAGE;
+			contador = TIEMPO_AUMENTO_DIFICULTAD;
+			modoRage = 3;
+		}
 		if(contador == TIEMPO_AUMENTO_DIFICULTAD){	//Cada X veces que se ejecute esta función aumentará la dificultad un poco.
 			if(zombies.length < LIMITE_ZOMBIES){	//Además de que se agregará un zombie extra.
 				sacarZombie();
 			}
 			
-			if(velocidadzombies > LIMITE_VELOCIDAD){	//Si puede ir mas rapido, irá mas rapido hasta llegar al limite.
+			if(velocidadzombies > LIMITE_VELOCIDAD || velocidadzombies == VELOCIDAD_RAGE){	//Si puede ir mas rapido, irá mas rapido hasta llegar al limite.
 				velocidadzombies-= DEINCREMENTO_VELOCIDAD;
 				clearInterval(movimientozombie);
 				movimientozombie = setInterval(function () {
@@ -251,6 +276,7 @@ function juego(){ //Función que se repetirá con cada frame del juego.
 	}else{
 		//FINAL DEL JUEGO: Se limpia el intervalo de juego y se muestra el ranking.
 		var audio = new Audio('audio/muerte.mp3');
+		cambiarMusica("audio/ranking.mp3");
 		audio.play();
 
 		clearInterval(refrescarjuego);
@@ -266,13 +292,23 @@ function juego(){ //Función que se repetirá con cada frame del juego.
 
 //Local storage
 function recibirDatos(){
-	var arrayStorage = JSON.parse(window.localStorage.getItem('jugadores'));
+	if(mapaactual == mapa1){
+		var arrayStorage = JSON.parse(window.localStorage.getItem('jugadores1'));
+	}else if(mapaactual == mapa2){
+		var arrayStorage = JSON.parse(window.localStorage.getItem('jugadores2'));
+	}
 	if(arrayStorage == null){
 		arrayStorage = [];
 	}
 	arrayStorage.push(jugador);
-	localStorage.setItem('jugadores', JSON.stringify(arrayStorage));
-	personas  = JSON.parse(window.localStorage.getItem('jugadores'));
+	
+	if(mapaactual == mapa1){
+		localStorage.setItem('jugadores1', JSON.stringify(arrayStorage));
+		personas  = JSON.parse(window.localStorage.getItem('jugadores1'));
+	}else if(mapaactual == mapa2){
+		localStorage.setItem('jugadores2', JSON.stringify(arrayStorage));
+		personas  = JSON.parse(window.localStorage.getItem('jugadores2'));
+	}
 	personas.sort(compare);
 	var output = "<ol><h1>RANKINGS</h1>"
 	//El ranking solo mostrará a los 10 primeros + la última partida.
@@ -343,8 +379,9 @@ function dibujar(){
 				}
 			}
 
-
-			insertarEnterrador();
+			if(enterrador){
+				insertarEnterrador();
+			}
 }
 
 
@@ -363,6 +400,7 @@ function restarVida(){
 
 	//Y se espera medio segundo a volver a aparecer, para dar tiempo a reaccionar.
 	enterrador = "";
+
 	setTimeout(function(){
 		enterrador = new Enterrador(mapaactual.respawn[0][0],mapaactual.respawn[0][1]);
 	}, 500);
@@ -370,7 +408,7 @@ function restarVida(){
 }
 
 function sumarPuntos(numero){
-	puntos = puntos+numero;
+	puntos = puntos+(numero*multiplicadorPuntos);
 }
 
 //Esta función es de las mas importantes del programa. Re-dibuja EN EL MAPA INTERNO al enterrador y lo mueve dependiendo de la tecla pulsada.
