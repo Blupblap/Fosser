@@ -250,10 +250,12 @@ function juego(){ //Función que se repetirá con cada frame del juego.
 		}
 	}else{
 		//FINAL DEL JUEGO: Se limpia el intervalo de juego y se muestra el ranking.
+		var audio = new Audio('audio/muerte.mp3');
+		audio.play();
+
 		clearInterval(refrescarjuego);
 		document.getElementById("final").style.display = "block";
 		jugador.puntuacionfinal = puntos;
-
 		seleccionandoMapa = true;
 		empezado = 2;
 		recibirDatos();
@@ -667,6 +669,7 @@ window.onkeydown = function(e) {
 				document.getElementById("ranking").style.display = "block";
 				empezado = 3;
 			}else if(empezado == 3){
+				aceptar.play();
 				iniciarJuego();
 			}
 		}	
