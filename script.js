@@ -579,8 +579,8 @@ function crearTumba(y,x){
 	muertezombie.play();
 	sumarPuntos(100);
 	var tumba = new Tumba(y,x);
+	tumbas.push(tumba);	
 	sacarZombie();
-	tumbas.push(tumba);
 }
 
 function dibujarAgujero(agujero){
@@ -622,15 +622,18 @@ function conseguirIndexSpawns(){
 
 //Saca un zombie de forma aleatoria en cualquiera de los dos spawners de zombies del mapa.
 function sacarZombie(){
-	var spawns = conseguirIndexSpawns();
-	var rand = Math.floor(Math.random()*2);
-	if(rand == 0){
-		zombie = new Zombie(spawns[0][0],spawns[0][1],mapaactual);
-		zombies.push(zombie);
-	}else if(rand == 1){
-		zombie = new Zombie(spawns[1][0],spawns[1][1],mapaactual);
-		zombies.push(zombie);
+	setTimeout(function(){		
+		var spawns = conseguirIndexSpawns();
+		var rand = Math.floor(Math.random()*2);
+		if(rand == 0){
+			zombie = new Zombie(spawns[0][0],spawns[0][1],mapaactual);
+			zombies.push(zombie);
+		}else if(rand == 1){
+			zombie = new Zombie(spawns[1][0],spawns[1][1],mapaactual);
+			zombies.push(zombie);
 	}
+	}, 500);
+	
 }
 
 function eliminarAgujero(index){

@@ -37,6 +37,7 @@ body{
 	width:32%;
 }
 #top{
+	display: none;
 	background-image:url("images/fondo.jpg");
 	background-repeat:no-repeat;
 	background-size:cover;
