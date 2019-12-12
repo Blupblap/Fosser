@@ -25,11 +25,11 @@ function dibujarZombie(zombie){
 }
 
 function moverZombie(zombie){
-	var caminosPosibles = []; 
-	if(zombie.aturdido == false){
+	var caminosPosibles = []; //Array de posibilidades.
+	if(zombie.aturdido == false){	//Si el zombie no está aturdido, se mueve.
 		if(zombie.xmapa-1 >= 0){
 			if(zombie.mapa.layout[zombie.ymapa][zombie.xmapa-1] == 0){
-				caminosPosibles.push("izquierda");
+				caminosPosibles.push("izquierda");	//Cada vez que un camino es posible, lo guarda en el array.
 			}
 		}
 		if(zombie.xmapa+1 < zombie.mapa.anchura){
@@ -50,11 +50,11 @@ function moverZombie(zombie){
 		
 		
 		
-		if(caminosPosibles.length > 0){
+		if(caminosPosibles.length > 0){	//Si existe algún camino posible (Siempre hay)
 			mapainterno[zombie.ymapa][zombie.xmapa] = 0;
-			if(caminosPosibles.includes("abajo") && zombie.direccion == "arriba"){
-				var index = caminosPosibles.indexOf("abajo");
-				caminosPosibles.splice(index,1);
+			if(caminosPosibles.includes("abajo") && zombie.direccion == "arriba"){	//Si está yendo hacia
+				var index = caminosPosibles.indexOf("abajo");			//Una dirección, no puede volver atrás
+				caminosPosibles.splice(index,1);						//Por lo que la elimina del array.
 			}
 			if(caminosPosibles.includes("arriba") && zombie.direccion == "abajo"){
 				var index = caminosPosibles.indexOf("arriba");
@@ -69,52 +69,52 @@ function moverZombie(zombie){
 				caminosPosibles.splice(index,1);
 			}
 			
-			if(caminosPosibles.length == 1){
+			if(caminosPosibles.length == 1){			//Si solo hay un camino posible, va por ese camino.
 				zombie.direccion = caminosPosibles[0];	
 			}else{
 
-				var rand = Math.floor(Math.random()*caminosPosibles.length);			
+				var rand = Math.floor(Math.random()*caminosPosibles.length);	//Si hay varios, elige aleatoriamente.	
 				zombie.direccion = caminosPosibles[rand];
 			}
 			
 		}
 		
-		if(zombie.direccion == "arriba"){
-			if(mapainterno[zombie.ymapa-1][zombie.xmapa] == 1){
-				restarVida();
-			}
-			zombie.y-=alturaCasilla/2;
+		if(zombie.direccion == "arriba"){		//Dependiendo de la dirección va hacia un lado u otro.
+			zombie.y-=alturaCasilla/2;	//El movimiento se separa en dos para dar efecto de dinamismo
 			setTimeout(function(){
 				zombie.y-=alturaCasilla/2;
 			}, 30);
-			zombie.ymapa-=1;
-		}else if(zombie.direccion == "abajo"){
-			if(mapainterno[zombie.ymapa+1][zombie.xmapa] == 1){
+			if(mapainterno[zombie.ymapa-1][zombie.xmapa] == 1){	//Si está el fosser ahí, lo mata.
 				restarVida();
 			}
+			zombie.ymapa-=1;
+		}else if(zombie.direccion == "abajo"){
 			zombie.y+=alturaCasilla/2;	
 			setTimeout(function(){
 				zombie.y+=alturaCasilla/2;
 			}, 30);
+			if(mapainterno[zombie.ymapa+1][zombie.xmapa] == 1){
+				restarVida();
+			}
 			zombie.ymapa+=1;
 
 		}else if(zombie.direccion == "izquierda"){
-			if(mapainterno[zombie.ymapa][zombie.xmapa-1] == 1){
-				restarVida();
-			}
 			zombie.x-=alturaCasilla/2;	
 			setTimeout(function(){
 				zombie.x-=alturaCasilla/2;
 			}, 30);
-			zombie.xmapa-=1;
-		}else if(zombie.direccion == "derecha"){
-			if(mapainterno[zombie.ymapa][zombie.xmapa+1] == 1){
+			if(mapainterno[zombie.ymapa][zombie.xmapa-1] == 1){
 				restarVida();
 			}
+			zombie.xmapa-=1;
+		}else if(zombie.direccion == "derecha"){
 			zombie.x+=alturaCasilla/2;	
 			setTimeout(function(){
 				zombie.x+=alturaCasilla/2;
 			}, 30);
+			if(mapainterno[zombie.ymapa][zombie.xmapa+1] == 1){
+				restarVida();
+			}
 			zombie.xmapa+=1;
 		}
 		
@@ -122,7 +122,7 @@ function moverZombie(zombie){
 		if(mapainterno[zombie.ymapa][zombie.xmapa] == 3){
 			var index = conseguirIndexAgujero(zombie.ymapa,zombie.xmapa);
 			if(agujeros[index].zombieDentro == false){
-				zombieficarAgujero(index);
+				zombieficarAgujero(index); //Si ha caído en un agujero, este se actualiza.
 				enAgujero(zombie);
 			}
 		}else{
@@ -131,27 +131,26 @@ function moverZombie(zombie){
 	}
 }
 
-function animacion(zombie,posicion,operador){
-
-
-}
-
 function enAgujero(zombie){
-	zombie.aturdido = true;
-	zombie.imagen = mapaactual.imagenzombiecaido;
-	zombie.aturdimiento = setInterval(function () {
-		if(zombie.contadorAturdido < 5 && zombie.aturdido != false){
-			zombie.aturdido = true;
-			zombie.contadorAturdido++;
-		}else{
-			zombie.contadorAturdido = 0;
-			zombie.imagen = mapaactual.imagenzombie;
-			clearInterval(zombie.aturdimiento);
-			zombie.aturdido = false;
-			var indice = conseguirIndexAgujero(zombie.ymapa,zombie.xmapa);
-			agujeros[indice].zombieDentro = false;
-		}
-	}, 1000);
+		zombie.aturdido = true;
+		zombie.imagen = mapaactual.imagenzombiecaido;	//Se le pone la imagen de estar caído
+		zombie.aturdimiento = setInterval(function () {	//Intervalo que se repite hasta que salga del agujero
+			if(zombie){
+				if(zombie.contadorAturdido < 5 && zombie.aturdido != false){
+					zombie.aturdido = true;
+					zombie.contadorAturdido++;
+				}else{
+					zombie.contadorAturdido = 0;
+					zombie.imagen = mapaactual.imagenzombie;
+					clearInterval(zombie.aturdimiento);
+					zombie.aturdido = false;
+					var indice = conseguirIndexAgujero(zombie.ymapa,zombie.xmapa);
+					if(agujeros[indice]){
+						agujeros[indice].zombieDentro = false;
+					}
+				}
+			}
+		}, 1000);
 }
 
 function conseguirIndexZombie(y,x){

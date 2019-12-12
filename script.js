@@ -144,11 +144,9 @@ function reiniciarVariables(){	//Reinicia todas las variables del juego.
 		myAudio.currentTime = 0;	
 	}
 	if(refrescarjuego){
-		console.log("He limpiado el juego");
 		clearInterval(refrescarjuego);
 	}
 	clearInterval(movimientozombie);
-	console.log(velocidadzombies);
 	document.getElementById("marcador").style.display = "none";
 	document.getElementById("final").style.display = "none";
 	document.getElementById("ranking").style.display = "none";
@@ -317,7 +315,6 @@ function recibirDatos(){
 	}
 	output+="-. "+jugador.nombre + ": <b>"+jugador.puntuacionfinal+"</b>";
 	output+="<br><h3>PULSA ESPACIO</h3></ol>";
-	console.log(output);
 	document.getElementById("ranking").innerHTML = output;
 }
 
@@ -393,8 +390,6 @@ function dibujarMarcador(){
 function restarVida(){
 	var audio = new Audio('audio/golpe.mp3');
 	audio.play();
-	console.log(vidas);
-	console.log("Has recibido daño");
 	vidas = vidas-1;
 	mapainternoset0();
 
