@@ -1,4 +1,7 @@
-"# Fosser" 
+"# Fosser"
+
+How to start: Open index.html with google chrome or firefox. I haven't tested it with any other browser.
+
 CONTROLS:
 
 MOVE: <- ^ v -> (Arrows)
