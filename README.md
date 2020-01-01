@@ -18,7 +18,7 @@ You can get killed by your holes too, be careful! You can remove an empty hole d
 
 There's a hard mode when you reach 3000 points. 
 
-If the game looks too small you can zoom in with the normal google zoom.
+If the game looks too small you can zoom in with the browser zoom.
 
 The code is probably really bad and this was a school project, so expect a lot of bugs.
 Also: There's no win screen, you can "win" filling the whole map with tombs, but the game doesnt end,
